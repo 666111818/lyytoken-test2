@@ -18,6 +18,7 @@ https://book.getfoundry.sh/
 ### Build
 
 ```shell
+fore clean
 $ forge build
 ```
 
@@ -49,7 +50,19 @@ $ anvil
 
 ```shell
 $ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+
+forge script script/DeployMyToken.s.sol:DeployMyToken --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
 ```
+
+### verify
+
+```shell
+forge verify-contract --chain-id 421614 --constructor-args $(cast abi-encode "constructor(uint256)" 1000000) --compiler-version 0.8.10 0x0c0076feA3c20bA7954F2e6e30D6749F23fdc9cD MyToken --etherscan-api-key "4A23BIE7RMBWV361YASYRWVEJNZXCSR243"
+```
+
+
+
+
 
 ### Cast
 
