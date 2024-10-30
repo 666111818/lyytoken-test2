@@ -4,6 +4,9 @@ out = "out"
 libs = ["lib"]
 rpc_url = "https://arbitrum-sepolia.blockpi.network/v1/rpc/public/3a0a73ce30784f22a21efd1ad6070c5b"
 chain_id = 421613 
+default_chain = "arb-sepolia"
 
+[rpc_endpoints]
+arb-sepolia = "https://arbitrum-sepolia.blockpi.network/v1/rpc/public/4A23BIE7RMBWV361YASYRWVEJNZXCSR243"
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

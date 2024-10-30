@@ -51,13 +51,31 @@ $ anvil
 ```shell
 $ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
 
+export PRIVATE_KEY="a7e342d09b2e973379a98f263fb5dab475b6d0f4829cc8f3561f7040364b67e1"
+export RPC_URL="https://arbitrum-sepolia.infura.io/v3/3a0a73ce30784f22a21efd1ad6070c5b"
+
 forge script script/DeployMyToken.s.sol:DeployMyToken --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
+```
+### 
+```shell
+1、安装 Cast 工具（如果尚未安装）：
+forge install foundry-rs/forge-std --no-commit
+2、使用 Cast 编码参数：
+cast abi-encode "constructor(uint256)" 1000000
+3、编码参数：
+ABI_ARGS=$(cast abi-encode "constructor(uint256)" 1000000)
+4、
+
 ```
 
 ### verify
 
 ```shell
-forge verify-contract --chain-id 421614 --constructor-args $(cast abi-encode "constructor(uint256)" 1000000) --compiler-version 0.8.10 0x0c0076feA3c20bA7954F2e6e30D6749F23fdc9cD MyToken --etherscan-api-key "4A23BIE7RMBWV361YASYRWVEJNZXCSR243"
+forge verify-contract 0xe6E2BD32FF1e566F6F3bBEcD241AC921d0C328A4 src/MyToken.sol:MyToken --constructor-args $ABI_ARGS --chain arbitrum-sepolia --api-key 4A23BIE7RMBWV361YASYRWVEJNZXCSR243
+
+
+RandomTransfers
+forge script script/RandomTransfers.s.sol:RandomTransfers --rpc-url https://arbitrum-sepolia.infura.io/v3/3a0a73ce30784f22a21efd1ad6070c5b --broadcast
 ```
 
 

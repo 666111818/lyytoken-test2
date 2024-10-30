@@ -8,11 +8,10 @@ contract DeployMyToken is Script {
     function run() external {
         vm.startBroadcast();
 
-        // 部署合约
         MyToken myToken = new MyToken(1000000); 
 
-        // 可以在这里调用合约的方法，如设置白名单
-        // myToken.setWhitelist(msg.sender, true);
+        
+        myToken.setWhitelist(msg.sender, true);
 
         vm.stopBroadcast();
     }
