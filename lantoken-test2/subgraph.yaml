@@ -10,7 +10,7 @@ dataSources:
     source:
       address: "0xe6E2BD32FF1e566F6F3bBEcD241AC921d0C328A4"
       abi: MyToken
-      startBlock: 92902903
+      startBlock: 92922025
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
