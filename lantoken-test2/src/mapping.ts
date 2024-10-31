@@ -19,6 +19,8 @@ export function handleApproval(event: ApprovalEvent): void {
   
   let approvalEntity = new Approval(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+
+    
   );
 
   approvalEntity.owner = event.params.owner;
