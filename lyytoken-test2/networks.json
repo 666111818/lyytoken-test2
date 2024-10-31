@@ -1,0 +1,8 @@
+{
+  "arbitrum-sepolia": {
+    "MyToken": {
+      "address": "0xA08F0aAfB517ed5A01831A6Ded8fb89f28519C2a",
+      "startBlock": 93225563
+    }
+  }
+}

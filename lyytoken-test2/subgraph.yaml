@@ -8,9 +8,9 @@ dataSources:
     name: MyToken
     network: arbitrum-sepolia
     source:
-      address: "0xe6E2BD32FF1e566F6F3bBEcD241AC921d0C328A4"
+      address: "0xA08F0aAfB517ed5A01831A6Ded8fb89f28519C2a"
       abi: MyToken
-      startBlock: 92922025
+      startBlock: 93225563
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -20,7 +20,6 @@ dataSources:
         - OwnershipTransferred
         - Transfer
         - TransferWithFee
-        - WhitelistUpdated
       abis:
         - name: MyToken
           file: ./abis/MyToken.json
@@ -31,8 +30,6 @@ dataSources:
           handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: TransferWithFee(indexed address,indexed address,uint256,uint256,uint256)
+        - event: TransferWithFee(indexed address,indexed address,uint256,uint256)
           handler: handleTransferWithFee
-        - event: WhitelistUpdated(indexed address,bool)
-          handler: handleWhitelistUpdated
       file: ./src/my-token.ts

@@ -4,8 +4,7 @@ import {
   Approval,
   OwnershipTransferred,
   Transfer,
-  TransferWithFee,
-  WhitelistUpdated
+  TransferWithFee
 } from "../generated/MyToken/MyToken"
 
 export function createApprovalEvent(
@@ -78,9 +77,8 @@ export function createTransferEvent(
 export function createTransferWithFeeEvent(
   from: Address,
   to: Address,
-  amount: BigInt,
-  fee: BigInt,
-  timestamp: BigInt
+  value: BigInt,
+  feeAmount: BigInt
 ): TransferWithFee {
   let transferWithFeeEvent = changetype<TransferWithFee>(newMockEvent())
 
@@ -93,38 +91,14 @@ export function createTransferWithFeeEvent(
     new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
   )
   transferWithFeeEvent.parameters.push(
-    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
-  )
-  transferWithFeeEvent.parameters.push(
-    new ethereum.EventParam("fee", ethereum.Value.fromUnsignedBigInt(fee))
+    new ethereum.EventParam("value", ethereum.Value.fromUnsignedBigInt(value))
   )
   transferWithFeeEvent.parameters.push(
     new ethereum.EventParam(
-      "timestamp",
-      ethereum.Value.fromUnsignedBigInt(timestamp)
+      "feeAmount",
+      ethereum.Value.fromUnsignedBigInt(feeAmount)
     )
   )
 
   return transferWithFeeEvent
-}
-
-export function createWhitelistUpdatedEvent(
-  user: Address,
-  isWhitelisted: boolean
-): WhitelistUpdated {
-  let whitelistUpdatedEvent = changetype<WhitelistUpdated>(newMockEvent())
-
-  whitelistUpdatedEvent.parameters = new Array()
-
-  whitelistUpdatedEvent.parameters.push(
-    new ethereum.EventParam("user", ethereum.Value.fromAddress(user))
-  )
-  whitelistUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "isWhitelisted",
-      ethereum.Value.fromBoolean(isWhitelisted)
-    )
-  )
-
-  return whitelistUpdatedEvent
 }

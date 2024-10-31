@@ -1,75 +1,67 @@
-// SPDX-License-Identifier: MIT 
-pragma solidity ^0.8.10; 
- 
-import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol"; 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol"; 
- 
-contract MyToken is ERC20, Ownable { 
-    uint256 public constant FEE_PERCENTAGE = 1; 
-    mapping(address => bool) public whitelisted; 
-    bool private locked; 
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-    
-    event TransferWithFee(address indexed from, address indexed to, uint256 amount, uint256 fee, uint256 timestamp); 
-    event WhitelistUpdated(address indexed user, bool isWhitelisted); 
- 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol"; 
+
+contract MyToken is ERC20, Ownable, ReentrancyGuard { 
+    uint256 public feePercent = 1; 
+    mapping(address => bool) public whitelisted;
+
+    event TransferWithFee(
+        address indexed from,
+        address indexed to,
+        uint256 value,
+        uint256 feeAmount
+    );
+
     constructor(uint256 initialSupply)  
-          ERC20("LyyToken", "LYY")  
-          Ownable(msg.sender)  
-      { 
-          _mint(msg.sender, initialSupply * 10 ** decimals()); 
-          locked = false; 
-      } 
- 
-    function setWhitelist(address user, bool isWhitelisted) external onlyOwner { 
-        whitelisted[user] = isWhitelisted; 
-        emit WhitelistUpdated(user, isWhitelisted); 
+        ERC20("LyyToken", "LYY")  
+        Ownable(msg.sender)  
+    { 
+        _mint(msg.sender, initialSupply * 10 ** decimals()); 
     } 
- 
-    modifier nonReentrant() { 
-        require(!locked, "ReentrancyGuard: reentrant call"); 
-        locked = true; 
-        _; 
-        locked = false; 
-    } 
- 
-    function _calculateFee(uint256 amount) private pure returns (uint256) { 
-        return (amount * FEE_PERCENTAGE) / 100; 
-    } 
- 
-    function transfer(address recipient, uint256 amount) public virtual override nonReentrant returns (bool) { 
-        uint256 fee = whitelisted[msg.sender] ? 0 : _calculateFee(amount); 
-        require(amount > fee, "Transfer amount must be greater than fee"); 
-        require(balanceOf(msg.sender) >= amount, "Insufficient balance for transfer"); 
 
-        uint256 amountAfterFee = amount - fee; 
-        super.transfer(recipient, amountAfterFee); 
- 
-        if (fee > 0) { 
-            super.transfer(owner(), fee); 
-        } 
+    function _update(address from, address to, uint256 value) internal override nonReentrant { 
+        uint256 fee = 0;
 
-        
-        emit TransferWithFee(msg.sender, recipient, amountAfterFee, fee, block.timestamp); 
-        return true; 
-    } 
- 
-    function transferFrom(address sender, address recipient, uint256 amount) public virtual override nonReentrant returns (bool) { 
-        uint256 fee = whitelisted[sender] ? 0 : _calculateFee(amount); 
-        require(amount > fee, "Transfer amount must be greater than fee"); 
-        require(balanceOf(sender) >= amount, "Insufficient balance for transfer"); 
+        if (!whitelisted[from]) {
+            fee = (value * feePercent) / 1000; 
+        }
 
-        uint256 amountAfterFee = amount - fee; 
-        super.transferFrom(sender, recipient, amountAfterFee); 
- 
-        if (fee > 0) { 
-            super.transferFrom(sender, owner(), fee); 
-        } 
+        uint256 amountAfterFee = value - fee;
 
-        
-        emit TransferWithFee(sender, recipient, amountAfterFee, fee, block.timestamp); 
-        return true; 
-    } 
+        if (from == address(0)) {
+            super._update(from, to, value); 
+        } else {
+            uint256 fromBalance = balanceOf(from);
+            require(fromBalance >= value, "ERC20: insufficient balance");
+
+            super._update(from, to, amountAfterFee); 
+
+            if (fee > 0) {
+                super._update(from, address(this), fee); 
+            }
+        }
+
+        emit TransferWithFee(from, to, amountAfterFee, fee);
+    }
+
+    function addToWhitelist(address account) external onlyOwner {
+        whitelisted[account] = true;
+    }
+
+    function removeFromWhitelist(address account) external onlyOwner {
+        whitelisted[account] = false;
+    }
+
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
+    }
+
+    function burn(uint256 amount) external {
+        _burn(msg.sender, amount); 
+    }
 }
-
 

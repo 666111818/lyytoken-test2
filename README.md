@@ -71,7 +71,7 @@ ABI_ARGS=$(cast abi-encode "constructor(uint256)" 1000000)
 ### verify
 
 ```shell
-forge verify-contract 0xe6E2BD32FF1e566F6F3bBEcD241AC921d0C328A4 src/MyToken.sol:MyToken --constructor-args $ABI_ARGS --chain arbitrum-sepolia --api-key 4A23BIE7RMBWV361YASYRWVEJNZXCSR243
+forge verify-contract 0xA08F0aAfB517ed5A01831A6Ded8fb89f28519C2a src/MyToken.sol:MyToken --constructor-args $ABI_ARGS --chain arbitrum-sepolia --api-key 4A23BIE7RMBWV361YASYRWVEJNZXCSR243
 
 
 RandomTransfers
