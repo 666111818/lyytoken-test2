@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt,log } from "@graphprotocol/graph-ts";
 import {
   Approval as ApprovalEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
@@ -11,12 +11,12 @@ import {
   OwnershipTransferred,
   Transfer,
   TransferWithFee,
-  FeeSummary,
-  WhitelistUpdated
+  WhitelistUpdated,
+  FeeSummary
 } from "../generated/schema";
 
 export function handleApproval(event: ApprovalEvent): void {
-  // Create Approval entity
+  
   let approvalEntity = new Approval(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
@@ -32,7 +32,7 @@ export function handleApproval(event: ApprovalEvent): void {
 }
 
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {
-  // Create OwnershipTransferred entity
+  
   let ownershipEntity = new OwnershipTransferred(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
@@ -47,23 +47,44 @@ export function handleOwnershipTransferred(event: OwnershipTransferredEvent): vo
 }
 
 export function handleTransfer(event: TransferEvent): void {
-  // Create Transfer entity
-  let transferEntity = new Transfer(
-    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
-  );
+    log.info("Handling Transfer event from {} to {} of value {}", [
+        event.params.from.toHex(),
+        event.params.to.toHex(),
+        event.params.value.toString(),
+    ]);
+  
+    let transferEntity = new Transfer(
+        event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+    );
 
-  transferEntity.from = event.params.from;
-  transferEntity.to = event.params.to;
-  transferEntity.value = event.params.value;
-  transferEntity.blockNumber = event.block.number;
-  transferEntity.blockTimestamp = event.block.timestamp;
-  transferEntity.transactionHash = event.transaction.hash;
+    transferEntity.from = event.params.from;
+    transferEntity.to = event.params.to;
+    transferEntity.value = event.params.value;
+    transferEntity.blockNumber = event.block.number;
+    transferEntity.blockTimestamp = event.block.timestamp;
+    transferEntity.transactionHash = event.transaction.hash;
 
-  transferEntity.save();
+    transferEntity.save();
+
+   
+    let minute = event.block.timestamp.div(BigInt.fromI32(60));
+    let feeSummaryId = minute.toString();
+
+    let feeSummary = FeeSummary.load(feeSummaryId);
+    if (!feeSummary) {
+        feeSummary = new FeeSummary(feeSummaryId);
+        feeSummary.minute = minute;
+        feeSummary.totalTransfers = BigInt.fromI32(0);
+        feeSummary.totalFees = BigInt.fromI32(0);
+    }
+
+    feeSummary.totalTransfers = feeSummary.totalTransfers.plus(BigInt.fromI32(1));
+    feeSummary.save();
 }
 
+
 export function handleTransferWithFee(event: TransferWithFeeEvent): void {
-  // Create TransferWithFee entity
+  
   let transferEntity = new TransferWithFee(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
@@ -72,7 +93,7 @@ export function handleTransferWithFee(event: TransferWithFeeEvent): void {
   transferEntity.to = event.params.to;
   transferEntity.amount = event.params.amount;
   transferEntity.fee = event.params.fee;
-  transferEntity.timestamp = event.block.timestamp;
+  transferEntity.timestamp = event.block.timestamp; 
 
   transferEntity.blockNumber = event.block.number;
   transferEntity.blockTimestamp = event.block.timestamp;
@@ -80,7 +101,7 @@ export function handleTransferWithFee(event: TransferWithFeeEvent): void {
 
   transferEntity.save();
 
-  // Update fee summary by minute
+  
   let minute = event.block.timestamp.div(BigInt.fromI32(60));
   let feeSummaryId = minute.toString();
 
@@ -99,7 +120,7 @@ export function handleTransferWithFee(event: TransferWithFeeEvent): void {
 }
 
 export function handleWhitelistUpdated(event: WhitelistUpdatedEvent): void {
-  // Create WhitelistUpdated entity
+  
   let whitelistEntity = new WhitelistUpdated(
     event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
